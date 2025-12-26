@@ -1,0 +1,16 @@
+# Audio processing libraries
+# Install with: pip install -r requirements.txt
+
+# Option 1: pydub (simpler, recommended for beginners)
+pydub>=0.25.1
+
+# Option 2: scipy + soundfile (more control, faster for large files)
+# Uncomment if you prefer this method:
+# numpy>=1.24.0
+# soundfile>=0.12.1
+
+# Note: pydub requires ffmpeg to be installed on your system
+# Install ffmpeg:
+#   - Ubuntu/Debian: sudo apt-get install ffmpeg
+#   - macOS: brew install ffmpeg
+#   - Windows: download from https://ffmpeg.org/
