@@ -1,14 +1,15 @@
 """
 Example usage of the Praat TextGrid parser and audio extractor.
 
-This script demonstrates how to use the parser programmatically.
+This script demonstrates how to use the parser programmatically with both
+WAV and MP3 audio files.
 """
 
 from praat_textgrid_parser import TextGridParser, extract_and_concatenate_audio
 
 
 def example_extract_r_segments():
-    """Example: Extract all 'r' labeled segments from audio."""
+    """Example: Extract all 'r' labeled segments from audio (WAV)."""
 
     # File paths
     wav_file = 'input_audio.wav'  # Replace with your WAV file path
@@ -39,8 +40,40 @@ def example_extract_r_segments():
     print(f"\nDone! Output saved to: {output_file}")
 
 
+def example_extract_r_segments_mp3():
+    """Example: Extract all 'r' labeled segments from MP3 audio."""
+
+    # File paths
+    mp3_file = 'input_audio.mp3'  # Replace with your MP3 file path
+    textgrid_file = 'input_textgrid.TextGrid'  # Replace with your TextGrid file path
+    output_file = 'output_r_segments.mp3'  # Output file path (MP3)
+
+    # Parse the TextGrid file
+    print("Parsing TextGrid file...")
+    parser = TextGridParser(textgrid_file)
+    parser.parse()
+
+    # Get all intervals with label 'r'
+    r_intervals = parser.get_intervals_by_label('r')
+    print(f"Found {len(r_intervals)} intervals labeled 'r'")
+
+    # Display the intervals
+    for i, interval in enumerate(r_intervals[:5], 1):  # Show first 5
+        print(f"  Interval {i}: {interval['xmin']:.3f}s - {interval['xmax']:.3f}s")
+    if len(r_intervals) > 5:
+        print(f"  ... and {len(r_intervals) - 5} more")
+
+    # Get time ranges
+    time_ranges = parser.get_time_ranges('r')
+
+    # Extract and concatenate audio
+    print(f"\nExtracting audio segments...")
+    extract_and_concatenate_audio(mp3_file, time_ranges, output_file, use_pydub=True)
+    print(f"\nDone! Output saved to: {output_file}")
+
+
 def example_extract_multiple_labels():
-    """Example: Extract multiple different labels to separate files."""
+    """Example: Extract multiple different labels to separate files (WAV)."""
 
     wav_file = 'input_audio.wav'
     textgrid_file = 'input_textgrid.TextGrid'
@@ -97,14 +130,18 @@ def example_analyze_textgrid():
 if __name__ == '__main__':
     # Uncomment the example you want to run:
 
-    # Example 1: Extract 'r' segments
+    # Example 1: Extract 'r' segments (WAV)
     # example_extract_r_segments()
 
-    # Example 2: Extract multiple labels to separate files
+    # Example 2: Extract 'r' segments (MP3)
+    # example_extract_r_segments_mp3()
+
+    # Example 3: Extract multiple labels to separate files
     # example_extract_multiple_labels()
 
-    # Example 3: Analyze TextGrid without audio extraction
+    # Example 4: Analyze TextGrid without audio extraction
     # example_analyze_textgrid()
 
     print("Please uncomment one of the examples above to run it.")
     print("Make sure to update the file paths with your actual files.")
+    print("\nSupported formats: WAV and MP3")

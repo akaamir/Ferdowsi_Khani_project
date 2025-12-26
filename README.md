@@ -1,13 +1,14 @@
 # Praat TextGrid Parser and Audio Segment Extractor
 
-A Python tool for parsing Praat TextGrid files and extracting audio segments based on interval labels.
+A Python tool for parsing Praat TextGrid files and extracting audio segments based on interval labels. Supports both WAV and MP3 audio formats.
 
 ## Features
 
 - Parse Praat TextGrid files in long format
 - Extract intervals by label (e.g., 'r', 'e', 'm')
-- Concatenate audio segments and save to WAV file
-- Support for both `pydub` and `scipy/soundfile` audio processing
+- Concatenate audio segments and save to WAV or MP3 files
+- Support for both `pydub` and `librosa` audio processing
+- Automatic format detection from file extension
 - Command-line interface and Python API
 
 ## Installation
@@ -18,7 +19,7 @@ A Python tool for parsing Praat TextGrid files and extracting audio segments bas
 pip install -r requirements.txt
 ```
 
-### 2. Install ffmpeg (required for pydub)
+### 2. Install ffmpeg (required for MP3 support)
 
 **Ubuntu/Debian:**
 ```bash
@@ -37,10 +38,22 @@ Download from [ffmpeg.org](https://ffmpeg.org/)
 
 ### Command Line Interface
 
-Basic usage to extract 'r' labeled segments:
+Basic usage to extract 'r' labeled segments from WAV:
 
 ```bash
 python praat_textgrid_parser.py input.wav input.TextGrid output_r.wav
+```
+
+Extract from MP3 and save as MP3:
+
+```bash
+python praat_textgrid_parser.py input.mp3 input.TextGrid output_r.mp3
+```
+
+Extract from MP3 and save as WAV:
+
+```bash
+python praat_textgrid_parser.py input.mp3 input.TextGrid output_r.wav
 ```
 
 Extract a different label (e.g., 'e' or 'm'):
@@ -49,14 +62,15 @@ Extract a different label (e.g., 'e' or 'm'):
 python praat_textgrid_parser.py input.wav input.TextGrid output_e.wav --label e
 ```
 
-Use scipy/soundfile instead of pydub:
+Use librosa instead of pydub:
 
 ```bash
-python praat_textgrid_parser.py input.wav input.TextGrid output.wav --method scipy
+python praat_textgrid_parser.py input.wav input.TextGrid output.wav --method librosa
 ```
 
 ### Python API
 
+**Working with WAV files:**
 ```python
 from praat_textgrid_parser import TextGridParser, extract_and_concatenate_audio
 
@@ -71,13 +85,29 @@ time_ranges = parser.get_time_ranges('r')
 extract_and_concatenate_audio('input.wav', time_ranges, 'output_r.wav')
 ```
 
+**Working with MP3 files:**
+```python
+from praat_textgrid_parser import TextGridParser, extract_and_concatenate_audio
+
+# Parse TextGrid file
+parser = TextGridParser('input.TextGrid')
+time_ranges = parser.get_time_ranges('r')
+
+# Extract from MP3, save as MP3
+extract_and_concatenate_audio('input.mp3', time_ranges, 'output_r.mp3')
+
+# Or extract from MP3, save as WAV
+extract_and_concatenate_audio('input.mp3', time_ranges, 'output_r.wav')
+```
+
 ## Examples
 
 See `example_usage.py` for more detailed examples:
 
-1. **Extract specific label segments**
-2. **Extract multiple labels to separate files**
-3. **Analyze TextGrid statistics**
+1. **Extract specific label segments (WAV)**
+2. **Extract specific label segments (MP3)**
+3. **Extract multiple labels to separate files**
+4. **Analyze TextGrid statistics**
 
 ## TextGrid Format
 
@@ -128,12 +158,12 @@ item []:
 
 ### extract_and_concatenate_audio
 
-**`extract_and_concatenate_audio(wav_path, time_ranges, output_path, use_pydub=True)`**
+**`extract_and_concatenate_audio(audio_path, time_ranges, output_path, use_pydub=True)`**
 - Extract audio segments and concatenate them
-- `wav_path`: Path to input WAV file
+- `audio_path`: Path to input audio file (WAV or MP3)
 - `time_ranges`: List of (start_time, end_time) tuples in seconds
-- `output_path`: Path for output WAV file
-- `use_pydub`: Use pydub (True) or scipy/soundfile (False)
+- `output_path`: Path for output audio file (WAV or MP3, auto-detected from extension)
+- `use_pydub`: Use pydub (True) or librosa (False)
 
 ## Output
 
@@ -158,8 +188,8 @@ Saved to: output_r.wav
 ## Requirements
 
 - Python 3.7+
-- pydub (recommended) OR scipy + soundfile
-- ffmpeg (for pydub)
+- pydub (recommended) OR librosa + soundfile
+- ffmpeg (required for MP3 support)
 
 ## License
 
@@ -169,12 +199,17 @@ This is open-source software. Feel free to use and modify as needed.
 
 **Error: "ffmpeg not found"**
 - Install ffmpeg (see Installation section)
-- Or use `--method scipy` to avoid ffmpeg dependency
+- ffmpeg is required for MP3 support with both pydub and librosa methods
 
 **Error: "No intervals found"**
 - Check that the label matches exactly (case-sensitive)
 - Verify the TextGrid file format matches the expected structure
 
 **Memory issues with large files**
-- Use `--method scipy` for better memory efficiency
+- Use `--method librosa` for better memory efficiency with large files
 - Consider processing in smaller chunks if needed
+
+**MP3 quality concerns**
+- Output MP3 files use the default quality settings
+- For lossless audio, use WAV format for both input and output
+- You can convert between formats: MP3 input → WAV output or vice versa

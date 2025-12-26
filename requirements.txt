@@ -1,16 +1,21 @@
 # Audio processing libraries
 # Install with: pip install -r requirements.txt
 
-# Option 1: pydub (simpler, recommended for beginners)
+# Option 1: pydub (recommended - supports both WAV and MP3)
 pydub>=0.25.1
 
-# Option 2: scipy + soundfile (more control, faster for large files)
+# Option 2: librosa + soundfile (more control, supports WAV and MP3)
 # Uncomment if you prefer this method:
-# numpy>=1.24.0
+# librosa>=0.10.0
 # soundfile>=0.12.1
+# numpy>=1.24.0
 
-# Note: pydub requires ffmpeg to be installed on your system
+# Note: Both options require ffmpeg to be installed on your system for MP3 support
 # Install ffmpeg:
 #   - Ubuntu/Debian: sudo apt-get install ffmpeg
 #   - macOS: brew install ffmpeg
 #   - Windows: download from https://ffmpeg.org/
+
+# Supported audio formats:
+#   - WAV (both methods)
+#   - MP3 (both methods, requires ffmpeg)
